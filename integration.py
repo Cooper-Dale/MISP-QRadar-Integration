@@ -1,3 +1,6 @@
+# usage: python3 MISP-QRADAR-integration.py >> /home/misp/misp-integration.log &
+# credits: https://github.com/karthikkbala/MISP-QRadar-Integration
+
 import requests
 import json
 import sys
@@ -11,16 +14,19 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #------*****------#
 
-misp_auth_key = "H23CE6eC3BYCGKJGJG67892vArAY7GmqNN2nGI"
-qradar_auth_key = "811aacf9-jh68-444h-98f4-5d25b7a94844"
+misp_auth_key = "YTcGLT6K2WC2DCbWemvYzeKBgc7ZzcxCOSnD"
+qradar_auth_key = "535f1adf-04b6-479c7c-7d093c3a07fe"
 qradar_ref_set = "MISP_Event_IOC"
-misp_server = "MISP Server IP"
-qradar_server = "QRadar Server IP"
-frequency = 60 # In minutes
+misp_server = "x"
+qradar_server = "y"
+#frequency = 60 # In minutes
+frequency = 15
 
 #------*****------#
 
-misp_url = "https://" + misp_server + "/attributes/restSearch/json/null/"
+#misp_url = "https://" + misp_server + "/attributes/restSearch/json/null/"
+misp_url = "http://" + misp_server + "/attributes/restSearch/json/null/"
+
 QRadar_POST_url = "https://" + qradar_server + "/api/reference_data/sets/bulk_load/" + qradar_ref_set
 
 MISP_headers = {
@@ -67,6 +73,7 @@ def get_misp_data(refSet_etype):
         print(time.strftime("%H:%M:%S") + " -- " + str(ioc_count) + " IOCs imported")
         if refSet_etype == "IP":
             print(time.strftime("%H:%M:%S") + " -- " + "Trying to clean the IOCs to IP address, as " + qradar_ref_set + " element type = IP")
+            # IPv6???
             r = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
             ioc_cleaned = list(filter(r.match, ioc_list))
             ioc_cleaned_data = json.dumps(ioc_cleaned)
@@ -80,12 +87,13 @@ def get_misp_data(refSet_etype):
         sys.exit()
 
 def qradar_post_IP(ioc_cleaned_data, ioc_count_cleaned):
+# curl -s -X POST -u Cooper -H 'Content-Type: application/json' -H 'Version: 9.1' -H 'Accept: application/json' --data-binary '["1.1.1.1","2.2.2.3"]' 'https://qradar.bb.iwy/api/reference_data/sets/bulk_load/MISP-test_Event_IOC'
     print(time.strftime("%H:%M:%S") + " -- " + "Initiating, IOC POST to QRadar ")
     qradar_response = requests.request("POST", QRadar_POST_url, data=ioc_cleaned_data, headers=QRadar_headers, verify=False)
     if qradar_response.status_code == 200:
         print(time.strftime("%H:%M:%S") + " -- " + "Imported " + str(ioc_count_cleaned) + " IOCs to QRadar (Success)" )
     else:
-        print(time.strftime("%H:%M:%S") + " -- " + "Could not POST IOCs to QRadar (Failure)")
+        print(time.strftime("%H:%M:%S") + " -- " + "Could not POST IOCs to QRadar (IP) (Failure). HTTP Status code: " + str(qradar_response.status_code) + "." )
 
 def qradar_post_all(import_data, ioc_count):
     print(time.strftime("%H:%M:%S") + " -- " + "Initiating, IOC POST to QRadar ")
@@ -94,7 +102,7 @@ def qradar_post_all(import_data, ioc_count):
         print(time.strftime("%H:%M:%S") + " -- " + " (Finished) Imported " + str(ioc_count) + " IOCs to QRadar (Success)" )
         print(time.strftime("%H:%M:%S") + " -- " + "Waiting to next schedule in " + schedule + "minutes")
     else:
-        print(time.strftime("%H:%M:%S") + " -- " + "Could not POST IOCs to QRadar (Failure)")
+        print(time.strftime("%H:%M:%S") + " -- " + "Could not POST IOCs to QRadar (all) (Failure)")
 
 def socket_check_qradar():
     print(time.strftime("%H:%M:%S") + " -- " + "Checking HTTPS Connectivity to QRadar")
