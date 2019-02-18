@@ -74,7 +74,8 @@ def get_misp_data(refSet_etype):
         if refSet_etype == "IP":
             print(time.strftime("%H:%M:%S") + " -- " + "Trying to clean the IOCs to IP address, as " + qradar_ref_set + " element type = IP")
             # IPv6???
-            r = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+            # r = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+            r = re.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
             ioc_cleaned = list(filter(r.match, ioc_list))
             ioc_cleaned_data = json.dumps(ioc_cleaned)
             ioc_count_cleaned = len(ioc_cleaned)
