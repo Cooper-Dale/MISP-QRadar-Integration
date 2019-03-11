@@ -18,7 +18,7 @@ from pymisp import PyMISP
 
 misp_auth_key = "YTcGL..."
 qradar_auth_key = "535f1a...e"
-qradar_ref_set = "MISP-test_Event_IOC2"
+qradar_ref_set = "MISP-test_Event_IOC"
 MISP_body = '{"to_ids":"true"}'
 misp_server = "x.x.x.x"
 qradar_server = "y.y.y.y"
