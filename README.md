@@ -26,10 +26,11 @@ MISP has rich RESTful API support to integrate with any producers or consumers o
  - Linux
  - Python 3 
  - apscheduler
+ - PyMISP
  
 ### Installation:
 ```sh
-git clone https://github.com/karthikkbala/MISP-QRadar-Integration.git
+git clone https://github.com/Cooper-Dale/MISP-QRadar-Integration.git
 ```
 
 ### Configuration:
@@ -40,6 +41,7 @@ Edit the integration.py file with favourite editor and provide the following inf
 misp_auth_key = "mxVt2yZWkS39XemrgtyhbfYts7ZeeheQ50dXKLHO"
 qradar_auth_key = "811aacf9-ef79-456h-98d4-5d27b7a94844"
 qradar_ref_set = "MISP_Event_IOC"
+MISP_body = '{"limit":"10","to_ids":"true","type":"ip-dst", ....}'
 misp_server = "IP Address of MISP Server"
 qradar_server = "IP Address of QRadar Server"
 frequency = 60 # In minutes
@@ -55,24 +57,27 @@ python3 integration.py >> /var/log/misp-integration.log &
  - Identify the Element Type of the reference set
  - If the Reference Set - Element Type is IP, only the IPs from the MISP will be imported to Reference Set.
  - Socket connection validation for QRadar and MISP
+ - Validate body/filter settings
 
 ### Output - Success
 
 ```
-17:05:50 -- Checking HTTPS Connectivity to QRadar
-17:05:50 -- (Success) HTTPS Connectivity to QRadar
-17:05:50 -- Checking HTTPS Connectivity to MISP
-17:05:50 -- (Success) HTTPS Connectivity to MISP
-17:05:50 -- Validating if reference set MISP_Event_IOC exists
-17:05:50 -- Validating reference set MISP_Event_IOC - (Success)
-17:05:50 -- Identifying Reference set MISP_Event_IOC element type
-17:05:50 -- Reference set element type = IP (Success)
-17:05:50 -- The QRadar Reference Set MISP_Event_IOC Element Type = "IP". Only IPs will be imported to QRadar and the other IOC types will be discarded
-17:05:50 -- Initiating, GET data from MISP on <IP Address of MISP Server>
-17:05:51 -- MISP API Query (Success)
-17:05:51 -- 36 IOCs imported
-17:05:51 -- Trying to clean the IOCs to IP address, as MISP_Event_IOC element type = IP
-17:05:51 -- (Success) Extracted 16 IPs from initial import.
-17:05:51 -- Initiating, IOC POST to QRadar
-17:05:51 -- Imported 16 IOCs to QRadar (Success)
+13:26:52 -- Checking HTTPS Connectivity to QRadar
+13:26:52 -- (Success) HTTPS Connectivity to QRadar
+13:26:52 -- Checking HTTPS Connectivity to MISP
+13:26:52 -- (Success) HTTPS Connectivity to MISP
+13:26:53 -- Validating if reference set MISP-test_Event_IOC exists
+13:26:53 -- Validating reference set MISP-test_Event_IOC - (Success)
+13:26:53 -- Identifying Reference set MISP-test_Event_IOC element type
+13:26:53 -- Reference set element type = IP (Success)
+13:26:53 -- The QRadar Reference Set MISP-test_Event_IOC Element Type = "IP". Only IPs will be imported to QRadar and the other IOC types will be discarded
+13:26:53 -- Filter:  {"limit":"10","to_ids":"true","type":"ip-dst"}
+13:26:53 -- Initiating, GET data from MISP on x.x.x.x
+13:26:53 -- MISP API Query (Success)
+13:26:53 -- 10 IOCs imported
+13:26:53 -- Trying to clean the IOCs to IP address, as MISP-test_Event_IOC element type = IP
+13:26:53 -- (Success) Extracted 10 IPs from initial import.
+13:26:53 -- Initiating, IOC POST to QRadar
+13:26:53 -- Imported 10 IOCs to QRadar (Success)
+
 ```
