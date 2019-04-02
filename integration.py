@@ -83,11 +83,20 @@ def get_pymisp_data(refSet_etype):
 			print(time.strftime("%H:%M:%S") + " -- " + "Trying to clean the IOCs to IP address, as " + qradar_ref_set + " element type = IP")
 			# IPv6??? #
 			# r = re.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
-			r = re.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
+			#r = re.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
 			# print(rList)
-			ioc_cleaned = list(filter(r.match, rList))
+			r = re.compile("(?:(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)\.){3}(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)")
+			#r = re.compile("(?:(?:1\d\d|2[0-5][0-5]|2[0-5]\d|[1-9]\d|0?0?\d)\.){3}(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)")
+			str1=''.join(rList)#
+			#print("Str1: ",str1)
+			r1=r.findall(str1)
+			ioc_cleaned = list(r1)
+			#print("\n\nIOC?cleaned: ",ioc_cleaned)
 			ioc_cleaned_data = json.dumps(ioc_cleaned)
 			ioc_count_cleaned = len(ioc_cleaned)
+			#ioc_cleaned = list(filter(r.match, rList))
+			#ioc_cleaned_data = json.dumps(ioc_cleaned)
+			#ioc_count_cleaned = len(ioc_cleaned)
 			print(time.strftime("%H:%M:%S") + " -- " + "(Success) Extracted " + str(ioc_count_cleaned) + " IPs from initial import.")
 			qradar_post_IP(ioc_cleaned_data, ioc_count_cleaned)
 		else:
@@ -101,7 +110,7 @@ def qradar_post_IP(ioc_cleaned_data, ioc_count_cleaned):
 	print(time.strftime("%H:%M:%S") + " -- " + "Initiating, IOC POST to QRadar ")
 	qradar_response = requests.request("POST", QRadar_POST_url, data=ioc_cleaned_data, headers=QRadar_headers, verify=False)
 	if qradar_response.status_code == 200:
-		print(time.strftime("%H:%M:%S") + " -- " + "Imported " + str(ioc_count_cleaned) + " IOCs to QRadar (Success)" )
+		print(time.strftime("%H:%M:%S") + " -- " + "Imported " + str(ioc_count_cleaned) + " IOCs to QRadar (Success) -------------------------" )
 	else:
 		print(time.strftime("%H:%M:%S") + " -- " + "Could not POST IOCs to QRadar (IP) (Failure). HTTP Status code: " + str(qradar_response.status_code) + "." )
 		# f = open(' MISP.log', 'w' )
@@ -129,6 +138,7 @@ def socket_check_qradar():
 		print(time.strftime("%H:%M:%S") + " -- " + "Could not establish HTTPS connection to QRadar, Please check connectivity before proceeding.")
 
 def socket_check_misp():
+	print(time.strftime("%d. %m. %Y") + " -- " + "Script start")
 	print(time.strftime("%H:%M:%S") + " -- " + "Checking HTTPS Connectivity to MISP")
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	result = sock.connect_ex((misp_server, int(443)))
